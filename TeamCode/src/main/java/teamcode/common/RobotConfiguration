@@ -1,0 +1,63 @@
+This is mostly a convinience for programmers to be able to reference the Config on the fly
+Please see teamcode/examples/RobotConfigurationEXAMPLE for how to format this document
+
+Expansion Hub 1:
+    Motor:
+        0. Name:   Type:     Power Source:     Encoder Source:
+        1. Name:   Type:     Power Source:     Encoder Source:
+        2. Name:   Type:     Power Source:     Encoder Source:
+        3. Name:   Type:     Power Source:     Encoder Source:
+
+    Servo:
+        0. Name:  Type:
+        1. Name:  Type:
+        2. Name:  Type:
+        3. Name:  Type:
+        4. Name:  Type:
+        5. Name:  Type:
+    Digital Device:
+        0.
+
+    Analog Device:
+
+    I2C Bus 0:
+        0. Name: imu Type: REV imu
+        1. Name: Type:
+
+    I2C Bus 1:
+
+    I2C Bus 2:
+
+    I2C Bus 3:
+
+
+
+Expansion Hub 2:
+    Motor:
+        0. Name:  Type:    Power Source:     Encoder Source:
+        1. Name:  Type:    Power Source:     Encoder Source:
+        2. Name:  Type:    Power Source:     Encoder Source:
+        3. Name:  Type:    Power Source:     Encoder Source:
+
+    Servo:
+        0. Name:  Type:
+        1. Name:  Type:
+        2. Name:  Type:
+        3. Name:  Type:
+        4. Name:  Type:
+        5. Name:  Type:
+    Digital Device:
+
+    Analog Device:
+
+    I2C Bus 0:
+        0. imu1
+
+    I2C Bus 1:
+
+    I2C Bus 2:
+
+    I2C Bus 3:
+
+Webcam 1
+    Name:    Type:

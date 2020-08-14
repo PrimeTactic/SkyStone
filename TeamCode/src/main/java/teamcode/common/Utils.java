@@ -8,6 +8,7 @@ public class Utils {
     public static final double SKYSTONE_LENGTH_INCHES = 8;
     public static final double SKYSTONE_WIDTH_INCHES = 4;
     public static final double MAT_LENGTH_INCHES = 24;
+    //TODO update the game constants
 
     private Utils() {
     }

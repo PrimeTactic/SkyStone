@@ -1,32 +1,20 @@
-package teamcode.test.AdvancedOdometry;
-
-import android.util.Pair;
-
-
+package teamcode.common;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.lynx.LynxModuleIntf;
-import com.qualcomm.hardware.lynx.commands.core.LynxGetBulkInputDataCommand;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import teamcode.common.AbstractOpMode;
-import teamcode.common.Vector2D;
-import teamcode.state.Constants;
 import teamcode.test.revextensions2.ExpansionHubEx;
 import teamcode.test.revextensions2.ExpansionHubMotor;
 import teamcode.test.revextensions2.RevBulkData;
 
-public class ArcPositionUpdate {
+import static java.lang.Math.*;
+
+public class Localizer {
+    //TODO before reading this file please note the static import of the math class,
+    // odds are if you see a math function it is from that and not a constatnt/method I created
+    //https://docs.google.com/document/d/1JQuU2M--rVFEa9ApKkOcc0CalsBxKjH-l0PQLRW7F3c/edit?usp=sharing proof behind the math
+
     private static final double ODOMETER_TICKS_TO_INCHES = 1.0 / 1102.0;
     private static final double HORIZONTAL_ODOMETER_ROTATION_OFFSET_TICKS = 0.4;
     private static final double VERTICAL_ODOMETER_TICKS_TO_RADIANS = 0.00006714153;
@@ -36,8 +24,9 @@ public class ArcPositionUpdate {
     private static final double TICKS_PER_REV = 8192;
     private static final double WHEEL_RADIUS = 1.181;
     private static final double GEAR_RATIO = 1;
-    private static final double CHASSIS_LENGTH = 16;
+    private static final double CHASSIS_LENGTH = 15.39;
     private static final double LENGTH_TOLERANCE = encoderTicksToInches(100);
+
 
     /**
      * Whether or not this GPS should continue to update positions.
@@ -54,52 +43,37 @@ public class ArcPositionUpdate {
     private final ExpansionHubMotor leftVertical, rightVertical, horizontal;
     private final ExpansionHubEx hub1 , hub2;
     private RevBulkData data1, data2;
+    private final BNO055IMU imu;
     private double previousOuterArcLength;
     private double previousInnerArcLength;
     private double previousHorizontalArcLength;
-    private BNO055IMU imu;
     private double thetaGyro;
     /**
      * @param position in inches
      * @param globalRads in radians
      */
-    public ArcPositionUpdate(HardwareMap hardwareMap, Point position, double globalRads) {
-        position.dilate(1.0 / ODOMETER_TICKS_TO_INCHES);
-        this.globalRads = globalRads;
-        currentPosition = position;
+    public Localizer(HardwareMap hardwareMap, Point position, double globalRads) {
         hub1 = hardwareMap.get(ExpansionHubEx.class,"Expansion Hub 1");
         hub2 = hardwareMap.get(ExpansionHubEx.class,"Expansion Hub 2");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         leftVertical = (ExpansionHubMotor)hardwareMap.dcMotor.get(Constants.LEFT_VERTICAL_ODOMETER_NAME);
         rightVertical = (ExpansionHubMotor)hardwareMap.dcMotor.get(Constants.RIGHT_VERTICAL_ODOMETER_NAME);
         horizontal = (ExpansionHubMotor)hardwareMap.dcMotor.get(Constants.HORIZONTAL_ODOMETER_NAME);
+        //position.dilate(1.0 / ODOMETER_TICKS_TO_INCHES);
+        this.globalRads = globalRads;
+        this.currentPosition = position;
         resetEncoders();
-        active = true;
-        Thread positionUpdater  = new Thread(){
-            public void run(){
-                while(active){
-                    updateValues();
-                }
-            }
-
-        };
 
         Thread positionCalculator = new Thread() {
             @Override
             public void run() {
-                while (active) {
+                while (AbstractOpMode.currentOpMode().opModeIsActive()) {
                     update();
                 }
+                System.out.println("safely disabled");
             }
         };
-        positionUpdater.start();
         positionCalculator.start();
-    }
-
-    private synchronized void updateValues() {
-        data1 = hub1.getBulkInputData();
-        data2 = hub2.getBulkInputData();
-        thetaGyro = imu.getAngularOrientation().firstAngle;
     }
 
     private void resetEncoders() {
@@ -109,34 +83,29 @@ public class ArcPositionUpdate {
         horizontal.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-
-
-
+    //see top of class for formalized proof of the math
     private synchronized void update() {
-        double innerArcLength = encoderTicksToInches(data2.getMotorCurrentPosition(leftVertical));
-        double outerArcLength = encoderTicksToInches(data1.getMotorCurrentPosition(rightVertical));
-        double horizontalArcLength = encoderTicksToInches(data1.getMotorCurrentPosition(horizontal));
-        double deltaOuterArcLength = outerArcLength - previousOuterArcLength;
+        double innerArcLength = encoderTicksToInches(leftVertical.getCurrentPosition());
+        double outerArcLength = encoderTicksToInches(rightVertical.getCurrentPosition());
+        double horizontalArcLength = encoderTicksToInches(horizontal.getCurrentPosition());
+
         double deltaInnerArcLength = innerArcLength - previousInnerArcLength;
-        double medianArc = (deltaOuterArcLength + deltaInnerArcLength) / 2.0; //median arc
-        double deltaArcLength = deltaOuterArcLength - deltaInnerArcLength;
-        double thetaOdo = deltaArcLength / CHASSIS_LENGTH;
-        if(medianArc > LENGTH_TOLERANCE){
-            //means the update does actually matter
+        double deltaOuterArcLength = outerArcLength - previousOuterArcLength;
+        double deltaHorizontalArcLength = horizontalArcLength - previousHorizontalArcLength;
 
-            double radius = (innerArcLength - deltaArcLength) / (2.0 * thetaOdo);
-            double medianRadius = radius + (CHASSIS_LENGTH / 2.0);
-
-            double deltaX = radius * Math.sin(medianArc / radius);
-            currentPosition.x += deltaX;
-            double deltaHorizontalArcLength = horizontalArcLength - previousHorizontalArcLength;
-            if(deltaHorizontalArcLength > 0) {
-                currentPosition.y += Math.sqrt(Math.pow(radius, 2) - Math.pow(deltaX, 2));
-            }else{
-                currentPosition.y -= Math.sqrt(Math.pow(radius, 2) - Math.pow(deltaX, 2));
-            }
-            //idk if my logic is correct here, future me or someone else check this up top (the Y Stuff)
+        double arcLength = (deltaInnerArcLength + deltaOuterArcLength) / 2.0;
+        double phi = (deltaOuterArcLength - deltaInnerArcLength) / CHASSIS_LENGTH; //phi is defined as the change in angle of the arclength
+        double hypotenuse;
+        if(abs(phi) < 0.0001){
+            //cornerCase to account for a non arc case, approximate arcLength equal to hypotenuse
+            hypotenuse = arcLength;
+        }else{
+            hypotenuse = (arcLength * sin(phi)) / (phi * cos(phi / 2.0));
         }
+        double newX = currentPosition.x + hypotenuse * cos((phi / 2.0) + globalRads) + deltaHorizontalArcLength * cos(globalRads + (phi / 2.0) - (PI / 2));
+        double newY = currentPosition.y + hypotenuse * sin((phi / 2.0)+ globalRads) + deltaHorizontalArcLength * sin(globalRads + (phi / 2.0) - (PI / 2));
+        globalRads += phi;
+        currentPosition = new Point(newX, newY);
         previousInnerArcLength = innerArcLength;
         previousOuterArcLength = outerArcLength;
         previousHorizontalArcLength = horizontalArcLength;
@@ -144,10 +113,11 @@ public class ArcPositionUpdate {
     }
 
 
-
-
-    private static double encoderTicksToInches(int ticks) {
-        return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
+    public static double encoderTicksToInches(int ticks) {
+        return WHEEL_RADIUS * 2 * PI * GEAR_RATIO * ticks / TICKS_PER_REV;
+    }
+    public static int inchesToEncoderTicks(double inches){
+        return (int)((TICKS_PER_REV / (WHEEL_RADIUS * 2 * PI * GEAR_RATIO)) * inches);
     }
 
     public Point getCurrentPosition(){
@@ -156,6 +126,7 @@ public class ArcPositionUpdate {
     public double getGlobalRads(){
         return globalRads;
     }
+
 
 
 }

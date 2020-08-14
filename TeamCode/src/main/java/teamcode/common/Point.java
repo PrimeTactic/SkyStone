@@ -1,8 +1,8 @@
-package teamcode.test.AdvancedOdometry;
+package teamcode.common;
 
 public class Point {
-    double x;
-    double y;
+    public double x;
+    public double y;
 
     private final double DEFAULT_VALUE_X = 0;
     private final double DEFAULT_VALUE_Y = 0;
@@ -43,9 +43,15 @@ public class Point {
         return "(" + this.x + "," + this.y + ")";
     }
 
+    public String toStringData(){
+        return this.x + " " + this.y;
+    }
+
     public double getDistance(Point other){
         return Math.sqrt(Math.pow(this.y - other.y, 2) +   Math.pow(this.x - other.x, 2));
     }
+
+
 
 
 

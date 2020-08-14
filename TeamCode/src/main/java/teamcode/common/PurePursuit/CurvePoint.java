@@ -1,4 +1,6 @@
-package teamcode.test.AdvancedOdometry;
+package teamcode.common.PurePursuit;
+
+import teamcode.common.Point;
 
 //point wrapper class
 public class CurvePoint {
