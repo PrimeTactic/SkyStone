@@ -1,4 +1,4 @@
-package teamcode.RookieProjects;
+package teamcode.RookieProjects.SensorBot;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;

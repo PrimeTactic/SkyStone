@@ -1,15 +1,15 @@
-package teamcode.RookieProjects;
+package teamcode.RookieProjects.DumpTruck;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import teamcode.common.Vector2D;
 
-public class SensorBotDriveTrain {
+public class DumpTruckDriveTrain {
 
     DcMotor fl, fr, bl, br;
 
-    public SensorBotDriveTrain(HardwareMap hardwareMap) {
+    public DumpTruckDriveTrain(HardwareMap hardwareMap) {
         fl = hardwareMap.dcMotor.get("FrontLeftDrive");
         fr = hardwareMap.dcMotor.get("FrontRightDrive");
         bl = hardwareMap.dcMotor.get("BackLeftDrive");

@@ -67,7 +67,6 @@ public class NewArcPos {
         resetEncoders();
         active = true;
 
-
         Thread positionCalculator = new Thread() {
             @Override
             public void run() {
@@ -106,7 +105,6 @@ public class NewArcPos {
         previousInnerArcLength = innerArcLength;
         previousOuterArcLength = outerArcLength;
         previousHorizontalArcLength = horizontalArcLength;
-
     }
 
     private void resetEncoders() {

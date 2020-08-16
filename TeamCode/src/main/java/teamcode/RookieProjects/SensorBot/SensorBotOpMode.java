@@ -1,17 +1,15 @@
-package teamcode.RookieProjects;
+package teamcode.RookieProjects.SensorBot;
 
-import android.hardware.Sensor;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import teamcode.RookieProjects.SensorBot.SensorBot;
+import teamcode.RookieProjects.SensorBot.SensorBotDriveTrain;
 import teamcode.common.AbstractOpMode;
 import teamcode.common.Vector2D;
-import teamcode.test.AdvancedOdometry.ArcPositionUpdate;
 
 @TeleOp(name="SensorTest")
 public class SensorBotOpMode extends AbstractOpMode {
