@@ -9,4 +9,12 @@ public class Constants {
 
     //other relevant info
     public static final String SAVE_FILE_PATH = "";
+    public static final double INITIAL_VELOCITY = 110.0 * Math.PI;
+
+    //Physics Constants
+    public static final double GRAVITY_IN_SEC = 386.09;
+
+    //Game Constants
+    public static final Point GOAL_POSITION = new Point();
+
 }

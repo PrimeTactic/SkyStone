@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import teamcode.common.PurePursuit.MovementVars;
 
 public class MecanumDriveTrain {
+    private static final double ANGULAR_TOLERANCE = 0.1;
 
     /*
     This has most of the relevant information regarding a 4 wheel Mechanum DriveTrain,
@@ -44,5 +45,22 @@ public class MecanumDriveTrain {
         fr.setPower(frPow);
         bl.setPower(blPow);
         br.setPower(brPow);
+    }
+
+
+    /**
+     *
+     * @param angle angle the robot should TURN TO in radians
+     * @param power
+     */
+    public void rotate(double angle, double power){
+        while(!isNear(Localizer.thisLocalizer().getGlobalRads(), angle)){
+            setPower(power, -power, power, -power);
+        }
+        setPower(0,0,0,0);
+    }
+
+    private boolean isNear(double globalRads, double angle) {
+        return Math.abs(globalRads - angle) < ANGULAR_TOLERANCE;
     }
 }

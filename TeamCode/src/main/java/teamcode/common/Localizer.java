@@ -26,6 +26,7 @@ public class Localizer {
     private static final double GEAR_RATIO = 1;
     private static final double CHASSIS_LENGTH = 15.39;
     private static final double LENGTH_TOLERANCE = encoderTicksToInches(100);
+    private static Localizer thisLocalizer;
 
 
     /**
@@ -40,6 +41,7 @@ public class Localizer {
      * In radians, as a direction.
      */
     private double globalRads;
+
     private final ExpansionHubMotor leftVertical, rightVertical, horizontal;
     private final ExpansionHubEx hub1 , hub2;
     private RevBulkData data1, data2;
@@ -63,7 +65,7 @@ public class Localizer {
         this.globalRads = globalRads;
         this.currentPosition = position;
         resetEncoders();
-
+        thisLocalizer = this;
         Thread positionCalculator = new Thread() {
             @Override
             public void run() {
@@ -125,6 +127,10 @@ public class Localizer {
     }
     public double getGlobalRads(){
         return globalRads;
+    }
+
+    public static Localizer thisLocalizer(){
+        return thisLocalizer;
     }
 
 
