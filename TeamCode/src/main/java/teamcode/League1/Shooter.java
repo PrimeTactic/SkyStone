@@ -11,6 +11,8 @@ import teamcode.common.AbstractOpMode;
 import teamcode.common.Constants;
 import teamcode.common.Localizer;
 import teamcode.common.MecanumDriveTrain;
+import teamcode.test.revextensions2.ExpansionHubEx;
+import teamcode.test.revextensions2.RevBulkData;
 
 public class Shooter {
     /*
@@ -23,6 +25,7 @@ public class Shooter {
     DcMotor roller, leftFlywheel, rightFlywheel;
     Servo leftAngle, rightAngle; //these servos should ALWAYS BE SYNCHRONIZED
     TouchSensor indexProgressor;
+    ExpansionHubEx hub;
 
     public Shooter(HardwareMap hardwareMap){
         roller = hardwareMap.dcMotor.get("rollerMotor");
@@ -97,6 +100,8 @@ public class Shooter {
     private double headingToDirectionRads(double heading){
         return heading + (Math.PI / 2.0);
     }
+
+
 
     //TODO add endgame functions and game specific electronics
 }

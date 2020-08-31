@@ -13,7 +13,7 @@ import static java.lang.Math.*;
 public class Localizer {
     //TODO before reading this file please note the static import of the math class,
     // odds are if you see a math function it is from that and not a constatnt/method I created
-    //https://docs.google.com/document/d/1JQuU2M--rVFEa9ApKkOcc0CalsBxKjH-l0PQLRW7F3c/edit?usp=sharing proof behind the math
+    //https://docs.google.com/ document/d/1JQuU2M--rVFEa9ApKkOcc0CalsBxKjH-l0PQLRW7F3c/edit?usp=sharing proof behind the math
 
     private static final double ODOMETER_TICKS_TO_INCHES = 1.0 / 1102.0;
     private static final double HORIZONTAL_ODOMETER_ROTATION_OFFSET_TICKS = 0.4;
@@ -76,7 +76,7 @@ public class Localizer {
             }
         };
         positionCalculator.start();
-    }
+    }    
 
     private void resetEncoders() {
         leftVertical.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
