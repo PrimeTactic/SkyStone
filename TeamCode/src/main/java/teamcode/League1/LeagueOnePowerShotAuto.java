@@ -1,4 +1,4 @@
-package teamcode.examples;
+package teamcode.League1;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -21,15 +21,14 @@ import teamcode.common.AbstractOpMode;
 import teamcode.common.Constants;
 import teamcode.common.Localizer;
 import teamcode.common.MecanumDriveTrain;
-import teamcode.common.PurePursuit.MovementVars;
 import teamcode.common.Point;
 import teamcode.common.PurePursuit.CurvePoint;
+import teamcode.common.PurePursuit.MovementVars;
 import teamcode.common.PurePursuit.PurePursuitMovement;
 import teamcode.common.Vector2D;
-import teamcode.test.CVNew.OpenCVTest;
 
 @Autonomous(name= "example Autonomous")
-public class SampleAutoScript extends AbstractOpMode {
+public class LeagueOnePowerShotAuto extends AbstractOpMode {
     /*
     this is an example script to showcase various autonomous elements
     such as use of the pure pursuit framework and the localizer as well the vision
@@ -40,7 +39,7 @@ public class SampleAutoScript extends AbstractOpMode {
     PurePursuitMovement movement;
     ArrayList<CurvePoint> allPoints;
     OpenCvWebcam webcam;
-    DetectedPosition position;
+    NumRings position;
 
     @Override
     protected void onInitialize() {
@@ -62,12 +61,20 @@ public class SampleAutoScript extends AbstractOpMode {
 
     }
 
-    enum DetectedPosition{
-        FIRST_POS, SECOND_POS, THIRD_POS
+    enum NumRings{
+        ZERO, ONE, FOUR
     }
 
     private class DetectionAlgorithm extends OpenCvPipeline{
         Mat workingMat;
+
+
+        //need to calibrate all these values
+        //min sum values of the mats in each of the 3 cases
+        private final double RINGS_ZERO_SUM = 0;
+        private final double RINGS_ONE_SUM = 1;
+        private final double RINGS_FOUR_SUM = 4;
+
 
         @Override
         public Mat processFrame(Mat input) {
@@ -77,34 +84,23 @@ public class SampleAutoScript extends AbstractOpMode {
                 return input;
             }
             Imgproc.cvtColor(workingMat, workingMat, Imgproc.COLOR_RGB2YCrCb); //grayscale the image
-            Mat left = workingMat.submat(120, 150, 10, 50);
-            Mat center = workingMat.submat(120, 150, 80, 120);
-            Mat right = workingMat.submat(120, 150, 150, 190);
+            Mat rings = workingMat.submat(120, 150, 10, 50); //cuts a submat from the whole image of what we want
 
 
-            Imgproc.rectangle(workingMat, new Rect(10, 120, 40, 30), new Scalar(0, 255, 0));
-            Imgproc.rectangle(workingMat, new Rect(80, 120, 40, 30), new Scalar(0, 255, 0));
-            Imgproc.rectangle(workingMat, new Rect(150, 120, 40, 30), new Scalar(0, 255, 0));
-            double leftSum = Core.sumElems(left).val[2];
-            double centerSum = Core.sumElems(center).val[2];
-            double rightSum = Core.sumElems(right).val[2];
+            Imgproc.rectangle(workingMat, new Rect(10, 120, 40, 30), new Scalar(0, 255, 0)); //draws a rectangle for debugging
+            // so we can see what the robot is looking at (the Submat)
 
-            if(leftSum > rightSum && leftSum > centerSum){
-                position = DetectedPosition.FIRST_POS;
+            double ringsMatSum = Core.sumElems(rings).val[2]; //sums the mats contents and from that we can deduce based on the sum how much orange
+            //is in the frame, using the conditional logic below we can deduce the stack size and therefore auto zone
+
+            if(ringsMatSum >= RINGS_ZERO_SUM && ringsMatSum < RINGS_ONE_SUM){
+                position = NumRings.ZERO;
+            }else if(ringsMatSum >= RINGS_ONE_SUM && ringsMatSum < RINGS_FOUR_SUM){
+                position = NumRings.ONE;
+            }else if(ringsMatSum >= RINGS_FOUR_SUM){
+                position = NumRings.FOUR;
             }
-            if(centerSum > rightSum && centerSum > leftSum){
-                position = DetectedPosition.SECOND_POS;
-            }
-            if(rightSum > centerSum && rightSum > leftSum){
-                position = DetectedPosition.THIRD_POS;
-            }
-            /*
-            from here all we do is calibrate the exact values of the submatrices relative to our
-            scoring objects and test the discrepency in the summation between the color values of
-            the 3 and as add some simple conditional logic to account for it
-            Something important to note is that the object next year is most likely a ball so the
-            rectangular shape will not be perfect
-             */
+
 
             return workingMat;
         }

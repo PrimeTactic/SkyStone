@@ -3,10 +3,10 @@ Please see teamcode/examples/RobotConfigurationEXAMPLE for how to format this do
 
 Expansion Hub 1:
     Motor:
-        0. Name:   Type:     Power Source:     Encoder Source:
-        1. Name:   Type:     Power Source:     Encoder Source:
-        2. Name:   Type:     Power Source:     Encoder Source:
-        3. Name:   Type:     Power Source:     Encoder Source:
+        0. Name: FrontLeftDrive  Type: Unspecified Motor    Power Source: FrontLeftDrive    Encoder Source: LeftOdometer
+        1. Name: FrontRightDrive  Type: Unspecified Motor    Power Source: FrontRightDrive    Encoder Source: RightOdometer
+        2. Name: BackLeftDrive  Type: Unspecified Motor    Power Source: BackLeftDrive    Encoder Source: BackOdometer
+        3. Name: BackRightDrive  Type: GOBilda 5202 Planetary Motor    Power Source: BackRightDrive    Encoder Source:
 
     Servo:
         0. Name:  Type:
@@ -15,6 +15,7 @@ Expansion Hub 1:
         3. Name:  Type:
         4. Name:  Type:
         5. Name:  Type:
+
     Digital Device:
         0.
 
@@ -60,4 +61,4 @@ Expansion Hub 2:
     I2C Bus 3:
 
 Webcam 1
-    Name:    Type:
+    Name: Webcam    Type: webcam

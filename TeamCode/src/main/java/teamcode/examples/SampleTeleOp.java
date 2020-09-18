@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import teamcode.League1.Shooter;
 import teamcode.common.AbstractOpMode;
 import teamcode.common.Constants;
 import teamcode.common.Localizer;
@@ -25,6 +26,7 @@ public class SampleTeleOp extends AbstractOpMode {
 
     MecanumDriveTrain driveTrain;
     Localizer localizer;
+    Shooter shooter;
     Thread driveThread;
     Thread armThread;
 
@@ -51,6 +53,7 @@ public class SampleTeleOp extends AbstractOpMode {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        shooter = new Shooter(hardwareMap);
         driveThread = new Thread(){
             public void run(){
                 while(opModeIsActive()){
@@ -69,12 +72,10 @@ public class SampleTeleOp extends AbstractOpMode {
             public void run(){
                 while(opModeIsActive()){
                     //do a variety of conditional things to manipulate scoring
-                    /*
-                    ex:
-                    if(gamepad1.rightTrigger > 0.3){
-                        arm.intake(INTAKE_MOTOR_POWER)
+                    if(gamepad1.right_trigger > 0.3){
+                        shooter.intake(INTAKE_MOTOR_POWER);
                      }
-                     */
+
                 }
             }
         };

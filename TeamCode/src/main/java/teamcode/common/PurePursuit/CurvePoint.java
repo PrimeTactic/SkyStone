@@ -9,7 +9,7 @@ public class CurvePoint {
     double moveSpeed;
     double turnSpeed;
     double followDistance;
-    double pointLength;
+    double pointLength; //may be able to add this sometime if we find it to be ne
     double slowDownTurnRads;
     //slows down robot when overshot
     double slowDownTurnAmount;
@@ -52,7 +52,6 @@ public class CurvePoint {
         //pointLength = thisPoint.pointLength;
         slowDownTurnRads = thisPoint.slowDownTurnRads;
         slowDownTurnAmount = thisPoint.slowDownTurnAmount;
-        isLast = true;
     }
 
     public Point toPoint(){

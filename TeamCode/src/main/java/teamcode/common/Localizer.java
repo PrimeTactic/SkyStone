@@ -72,7 +72,6 @@ public class Localizer {
                 while (AbstractOpMode.currentOpMode().opModeIsActive()) {
                     update();
                 }
-                System.out.println("safely disabled");
             }
         };
         positionCalculator.start();
