@@ -13,14 +13,14 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
 repositories {
     mavenCentral()
 }
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation files('src/main/java/teamcode/test/AdvancedOdometry/commons-math3-3.6.1.jar')
     implementation 'org.openftc:easyopencv:1.4.1'
 }
 

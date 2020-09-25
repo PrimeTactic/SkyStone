@@ -13,6 +13,7 @@ public abstract class AbstractOpMode extends LinearOpMode {
     @Override
     public final void runOpMode() {
         opMode = this;
+        Debug.clear();
         try {
             onInitialize();
             waitForStart();

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import teamcode.common.PurePursuit.MathFunctions;
 import teamcode.test.revextensions2.ExpansionHubEx;
 import teamcode.test.revextensions2.ExpansionHubMotor;
 import teamcode.test.revextensions2.RevBulkData;
@@ -24,7 +25,8 @@ public class Localizer {
     private static final double TICKS_PER_REV = 8192;
     private static final double WHEEL_RADIUS = 1.181;
     private static final double GEAR_RATIO = 1;
-    private static final double CHASSIS_LENGTH = 15.39;
+    private static final double CHASSIS_LENGTH = 13.5;
+    private static final double ODO_XY_DISTANCE = 10.8;
     private static final double LENGTH_TOLERANCE = encoderTicksToInches(100);
     private static Localizer thisLocalizer;
 
@@ -43,7 +45,7 @@ public class Localizer {
     private double globalRads;
 
     private final ExpansionHubMotor leftVertical, rightVertical, horizontal;
-    private final ExpansionHubEx hub1 , hub2;
+    private final ExpansionHubEx hub1;
     private RevBulkData data1, data2;
     private final BNO055IMU imu;
     private double previousOuterArcLength;
@@ -56,7 +58,8 @@ public class Localizer {
      */
     public Localizer(HardwareMap hardwareMap, Point position, double globalRads) {
         hub1 = hardwareMap.get(ExpansionHubEx.class,"Expansion Hub 1");
-        hub2 = hardwareMap.get(ExpansionHubEx.class,"Expansion Hub 2");
+
+        //hub2 = hardwareMap.get(ExpansionHubEx.class,"Expansion Hub 2");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         leftVertical = (ExpansionHubMotor)hardwareMap.dcMotor.get(Constants.LEFT_VERTICAL_ODOMETER_NAME);
         rightVertical = (ExpansionHubMotor)hardwareMap.dcMotor.get(Constants.RIGHT_VERTICAL_ODOMETER_NAME);
@@ -69,6 +72,8 @@ public class Localizer {
         Thread positionCalculator = new Thread() {
             @Override
             public void run() {
+                while(!AbstractOpMode.currentOpMode().opModeIsActive());
+
                 while (AbstractOpMode.currentOpMode().opModeIsActive()) {
                     update();
                 }
@@ -81,20 +86,26 @@ public class Localizer {
         leftVertical.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightVertical.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         horizontal.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftVertical.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightVertical.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        horizontal.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         horizontal.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftVertical.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     //see top of class for formalized proof of the math
     private synchronized void update() {
-        double innerArcLength = encoderTicksToInches(leftVertical.getCurrentPosition());
-        double outerArcLength = encoderTicksToInches(rightVertical.getCurrentPosition());
-        double horizontalArcLength = encoderTicksToInches(horizontal.getCurrentPosition());
+        data1 = hub1.getBulkInputData();
+        double innerArcLength = encoderTicksToInches(data1.getMotorCurrentPosition(leftVertical));
+        double outerArcLength = encoderTicksToInches(data1.getMotorCurrentPosition(rightVertical));
+        double horizontalArcLength = -encoderTicksToInches(data1.getMotorCurrentPosition(horizontal));
 
         double deltaInnerArcLength = innerArcLength - previousInnerArcLength;
         double deltaOuterArcLength = outerArcLength - previousOuterArcLength;
         double deltaHorizontalArcLength = horizontalArcLength - previousHorizontalArcLength;
 
         double arcLength = (deltaInnerArcLength + deltaOuterArcLength) / 2.0;
+
         double phi = (deltaOuterArcLength - deltaInnerArcLength) / CHASSIS_LENGTH; //phi is defined as the change in angle of the arclength
         double hypotenuse;
         if(abs(phi) < 0.0001){
@@ -103,9 +114,11 @@ public class Localizer {
         }else{
             hypotenuse = (arcLength * sin(phi)) / (phi * cos(phi / 2.0));
         }
-        double newX = currentPosition.x + hypotenuse * cos((phi / 2.0) + globalRads) + deltaHorizontalArcLength * cos(globalRads + (phi / 2.0) - (PI / 2));
-        double newY = currentPosition.y + hypotenuse * sin((phi / 2.0)+ globalRads) + deltaHorizontalArcLength * sin(globalRads + (phi / 2.0) - (PI / 2));
+
+        double newX = currentPosition.x + hypotenuse * cos((phi / 2.0) + globalRads) + deltaHorizontalArcLength * (cos(globalRads + (phi / 2.0) - (PI / 2)));
+        double newY = currentPosition.y + hypotenuse * sin((phi / 2.0)+ globalRads) + deltaHorizontalArcLength * (sin(globalRads + (phi / 2.0) - (PI / 2)));
         globalRads += phi;
+        globalRads = MathFunctions.angleWrap(globalRads);
         currentPosition = new Point(newX, newY);
         previousInnerArcLength = innerArcLength;
         previousOuterArcLength = outerArcLength;
@@ -130,6 +143,18 @@ public class Localizer {
 
     public static Localizer thisLocalizer(){
         return thisLocalizer;
+    }
+
+    public int getLeftVerticalOdometerPosition(){
+        return leftVertical.getCurrentPosition();
+    }
+
+    public int getRightVerticalOdometerPosition(){
+        return rightVertical.getCurrentPosition();
+    }
+
+    public int getHorizontalOdometerPosition(){
+        return horizontal.getCurrentPosition();
     }
 
 

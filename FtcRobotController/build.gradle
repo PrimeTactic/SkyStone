@@ -22,9 +22,8 @@ android {
 }
 
 dependencies {
-    implementation files('C:\\Users\\fizzi\\Desktop\\commons-math3-3.6.1-bin.zip\\commons-math3-3.6.1')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation files('C:/Users/fizzi/Documents/GitHub/SkyStone/.idea/libraries/commons-math3-3.6.1.jar')
+
 }
 
 repositories {

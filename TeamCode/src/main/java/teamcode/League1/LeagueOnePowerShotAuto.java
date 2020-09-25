@@ -157,11 +157,7 @@ public class LeagueOnePowerShotAuto extends AbstractOpMode {
     private void followPath(ArrayList<CurvePoint> path) {
         movement.initPath(path);
         while(movement.isActive || opModeIsActive()){
-            try {
-                movement.followCurve(path, 0); //path is the path and follow angle is in DEGREES
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            movement.followCurve(path, 0); //path is the path and follow angle is in DEGREES
             drivetrain.setPower(new Vector2D(MovementVars.movementX, -MovementVars.movementY), MovementVars.movementTurn);
         }
     }

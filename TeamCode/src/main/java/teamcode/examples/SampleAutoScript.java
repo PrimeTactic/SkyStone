@@ -48,7 +48,7 @@ public class SampleAutoScript extends AbstractOpMode {
         movement = new PurePursuitMovement(localizer);
         drivetrain = new MecanumDriveTrain(hardwareMap);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
         DetectionAlgorithm detector = new DetectionAlgorithm();
         webcam.setPipeline(detector);
         webcam.openCameraDeviceAsync(() -> {
@@ -161,11 +161,7 @@ public class SampleAutoScript extends AbstractOpMode {
     private void followPath(ArrayList<CurvePoint> path) {
         movement.initPath(path);
         while(movement.isActive || opModeIsActive()){
-            try {
-                movement.followCurve(path, 0); //path is the path and follow angle is in DEGREES
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            movement.followCurve(path, 0); //path is the path and follow angle is in DEGREES
             drivetrain.setPower(new Vector2D(MovementVars.movementX, -MovementVars.movementY), MovementVars.movementTurn);
         }
     }

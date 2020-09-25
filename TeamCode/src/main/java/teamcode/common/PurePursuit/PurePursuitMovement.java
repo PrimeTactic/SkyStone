@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import teamcode.common.Debug;
 import teamcode.common.Localizer;
 import teamcode.common.Point;
 import teamcode.common.PurePursuit.CurvePoint;
@@ -29,6 +30,7 @@ public class PurePursuitMovement {
 
     private final double ROBOT_RADIUS_CENTIMETERS = 9 * 2.54;
     private int currentRobotIndex;
+    private double distanceTolerance;
 
     public PurePursuitMovement(Localizer robot) {
         this.robot = robot;
@@ -37,7 +39,7 @@ public class PurePursuitMovement {
     }
 
 
-    public CurvePoint getFollowPointPath(ArrayList<CurvePoint> path, Point robotLocation, double followRadius) throws FileNotFoundException {
+    public CurvePoint getFollowPointPath(ArrayList<CurvePoint> path, Point robotLocation, double followRadius)  {
         CurvePoint followMe = new CurvePoint(path.get(0));
         for (int i = 0; i < path.size() - 1; i++) {
             CurvePoint startLine = path.get(i);
@@ -103,14 +105,15 @@ public class PurePursuitMovement {
      * @param allPoints   path the robot is pursuing
      * @param followAngle angle the robot should stick to in degrees
      */
-    public void followCurve(ArrayList<CurvePoint> allPoints, double followAngle) throws FileNotFoundException {
+    public void followCurve(ArrayList<CurvePoint> allPoints, double followAngle)  {
         CurvePoint followMe;
         currentRobotIndex = findPositionInPath(allPoints, robot.getCurrentPosition());
         followMe = getFollowPointPath(allPoints, new Point(robot.getCurrentPosition().x, robot.getCurrentPosition().y), allPoints.get(currentRobotIndex).followDistance);
-        if (robotIsNearPoint(allPoints.get(allPoints.size() - 1))) {
+        if(robotIsNearPoint(allPoints.get(allPoints.size() - 1))) {
             brake();
             return;
         }
+        distanceTolerance = allPoints.get(currentRobotIndex).followDistance;
         goToPosition(followMe.x, followMe.y, followMe.moveSpeed, followAngle, followMe.turnSpeed);
     }
 
@@ -179,7 +182,7 @@ public class PurePursuitMovement {
         double absoluteAngle = atan2(deltaY, deltaX);
         //System.out.println(absoluteAngle);
         //angle of motion
-        double relativeAngle = MathFunctions.angleWrap(absoluteAngle - (robot.getGlobalRads() - toRadians(90)));
+        double relativeAngle = MathFunctions.angleWrap(absoluteAngle - (robot.getGlobalRads()));
         //change in angle
         //change in the robots position
         double relativeDistanceX = distanceTravelled * cos(relativeAngle);
@@ -193,10 +196,13 @@ public class PurePursuitMovement {
         //assigning power to driveTrain
         double relativeTurnAngle = relativeAngle + preferredAngle;
         MovementVars.movementTurn = clip(relativeTurnAngle / toRadians(30), -1, 1) * turnPower;
+        if(distanceTravelled < distanceTolerance){
+            MovementVars.movementTurn = 0;
+        }
     }
 
 
-    private ArrayList<Point> lineCircleIntersection(Point circleCenter, double radius, Point linePoint1, Point linePoint2) throws FileNotFoundException {
+    private ArrayList<Point> lineCircleIntersection(Point circleCenter, double radius, Point linePoint1, Point linePoint2) {
         //(mx+b)^2 = r^2 + x^2
         if (abs(linePoint1.y - linePoint2.y) < Y_POINT_TOLERANCE_INTERSECT) {
             linePoint1.y = linePoint2.y + Y_POINT_TOLERANCE_INTERSECT;
