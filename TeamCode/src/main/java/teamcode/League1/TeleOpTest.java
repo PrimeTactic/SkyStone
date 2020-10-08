@@ -30,7 +30,7 @@ public class TeleOpTest extends AbstractOpMode {
     Shooter shooter;
     Localizer localizer;
     Thread driveThread;
-    Thread armThread;
+    Thread shootThread;
 
 
 
@@ -67,7 +67,9 @@ public class TeleOpTest extends AbstractOpMode {
             }
         };
 
-        armThread = new Thread(){
+
+
+        shootThread = new Thread(){
             public void run(){
                 while(opModeIsActive()){
                     //do a variety of conditional things to manipulate scoring
@@ -91,7 +93,7 @@ public class TeleOpTest extends AbstractOpMode {
 
     @Override
     protected void onStart() {
-        armThread.start();
+        shootThread.start();
         driveThread.start();
         while(opModeIsActive());
     }
@@ -102,6 +104,8 @@ public class TeleOpTest extends AbstractOpMode {
         telemetry.update();
 
         driveTrain.setPower(0.0,0.0,0.0,0.0);
+
+
     }
 
 
