@@ -1,6 +1,7 @@
 This is mostly a convinience for programmers to be able to reference the Config on the fly
 Please see teamcode/examples/RobotConfigurationEXAMPLE for how to format this document
 
+TODO Update
 Expansion Hub 1:
     Motor:
         0. Name: FrontLeftDrive  Type: Unspecified Motor    Power Source: FrontLeftDrive    Encoder Source: LeftOdometer

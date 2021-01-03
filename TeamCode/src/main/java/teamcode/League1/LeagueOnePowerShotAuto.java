@@ -27,7 +27,7 @@ import teamcode.common.PurePursuit.MovementVars;
 import teamcode.common.PurePursuit.PurePursuitMovement;
 import teamcode.common.Vector2D;
 
-@Autonomous(name= "example Autonomous")
+@Autonomous(name= "Powershot")
 public class LeagueOnePowerShotAuto extends AbstractOpMode {
     /*
     this is an example script to showcase various autonomous elements

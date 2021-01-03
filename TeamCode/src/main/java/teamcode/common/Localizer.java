@@ -29,6 +29,7 @@ public class Localizer {
     private static final double ODO_XY_DISTANCE = 10.8;
     private static final double LENGTH_TOLERANCE = encoderTicksToInches(100);
     private static Localizer thisLocalizer;
+    //-2.641358450698 - (-2.641358450698 * 1.2)
 
 
     /**
@@ -106,6 +107,7 @@ public class Localizer {
 
         double arcLength = (deltaInnerArcLength + deltaOuterArcLength) / 2.0;
 
+
         double phi = (deltaOuterArcLength - deltaInnerArcLength) / CHASSIS_LENGTH; //phi is defined as the change in angle of the arclength
         double hypotenuse;
         if(abs(phi) < 0.0001){
@@ -115,8 +117,13 @@ public class Localizer {
             hypotenuse = (arcLength * sin(phi)) / (phi * cos(phi / 2.0));
         }
 
-        double newX = currentPosition.x + hypotenuse * cos((phi / 2.0) + globalRads) + deltaHorizontalArcLength * (cos(globalRads + (phi / 2.0) - (PI / 2)));
-        double newY = currentPosition.y + hypotenuse * sin((phi / 2.0)+ globalRads) + deltaHorizontalArcLength * (sin(globalRads + (phi / 2.0) - (PI / 2)));
+        double horizontalDelta = deltaHorizontalArcLength - (phi * ODO_XY_DISTANCE);
+
+
+        Debug.log(horizontalDelta);
+
+        double newX = currentPosition.x + hypotenuse * cos((phi / 2.0) + globalRads) + horizontalDelta * (cos(globalRads + (phi / 2.0) - (PI / 2)));
+        double newY = currentPosition.y + hypotenuse * sin((phi / 2.0)+ globalRads) + horizontalDelta * (sin(globalRads + (phi / 2.0) - (PI / 2)));
         globalRads += phi;
         globalRads = MathFunctions.angleWrap(globalRads);
         currentPosition = new Point(newX, newY);

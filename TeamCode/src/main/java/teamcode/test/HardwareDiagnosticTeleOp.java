@@ -35,8 +35,8 @@ public class HardwareDiagnosticTeleOp extends AbstractOpMode {
             }
         }.start();
         while(opModeIsActive()){
-            telemetry.addData("Position ", localizer.getCurrentPosition());
-            telemetry.addData("Global Rads: ", localizer.getGlobalRads());
+            //telemetry.addData("Position ", localizer.getCurrentPosition());
+            //telemetry.addData("Global Rads: ", localizer.getGlobalRads());
             telemetry.update();
         }
         while(opModeIsActive());

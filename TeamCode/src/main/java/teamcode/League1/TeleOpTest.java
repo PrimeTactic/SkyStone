@@ -81,7 +81,7 @@ public class TeleOpTest extends AbstractOpMode {
                         shooter.intake(INTAKE_MOTOR_POWER);
                      }
                     if(gamepad1.x) {
-                        shooter.shoot();
+                        shooter.shoot(1);
                 }
             }
         }

@@ -27,8 +27,23 @@ public class HardwareDiagnosticAuto extends AbstractOpMode {
     @Override
     protected void onStart() {
 
-        drive.setPower(POWER, POWER, POWER, POWER);
-//        DcMotor[] motors = drive.getMotors();
+        //FIXED
+        try {
+            //drive.setPower(POWER, 0, 0, 0); //good
+            //Thread.sleep(1000);
+//            drive.setPower(0, POWER, 0, 0); //good
+//            Thread.sleep(1000);
+            //drive.setPower(0, 0, POWER, 0); //bad
+            //Thread.sleep(1000);
+            drive.setPower(0, 0, 0, POWER); //bad
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
+        //        DcMotor[] motors = drive.getMotors();
 //        motors[0].setPower(POWER);
 //        Debug.log("Front Left: " + motors[0].getPower());
 //        Debug.log("FL Port Num: " + motors[0].getPortNumber());
@@ -56,7 +71,6 @@ public class HardwareDiagnosticAuto extends AbstractOpMode {
 //        Debug.log("BR RunMode: " + motors[3].getMode());
 //        Utils.sleep(5000);
 //        motors[3].setPower(0);
-        while(opModeIsActive());
     }
 
     @Override

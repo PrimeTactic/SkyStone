@@ -9,6 +9,7 @@ import java.util.Timer;
 
 import teamcode.common.AbstractOpMode;
 import teamcode.common.Constants;
+import teamcode.common.Debug;
 import teamcode.common.Localizer;
 import teamcode.common.MecanumDriveTrain;
 import teamcode.common.Utils;
@@ -16,8 +17,8 @@ import teamcode.test.revextensions2.ExpansionHubEx;
 import teamcode.test.revextensions2.RevBulkData;
 
 public class Shooter {
-    private static final double INDEXER_EXTENDED_POS = 1.0;
-    private static final double INDEXER_RETRACTED_POS = 0.0;
+    private static final double INDEXER_EXTENDED_POS = 1;
+    private static final double INDEXER_RETRACTED_POS = 0.65;
     /*
     Electronics Schematic:
     1x Motor Roller
@@ -27,15 +28,17 @@ public class Shooter {
     this schematic assumes the through gravity indexer
      */
 
-    DcMotor roller, leftFlywheel, rightFlywheel;
+    DcMotor  roller, flywheel;
     Servo indexer;
     ExpansionHubEx hub;
 
     public Shooter(HardwareMap hardwareMap){
-        roller = hardwareMap.dcMotor.get("rollerMotor");
-        leftFlywheel = hardwareMap.dcMotor.get("leftFlywheel");
-        rightFlywheel = hardwareMap.dcMotor.get("rightFlywheel");
+        roller = hardwareMap.dcMotor.get("Intake");
+        flywheel = hardwareMap.dcMotor.get("Shooter");
         indexer = hardwareMap.servo.get("Indexer");
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        indexer.setPosition(INDEXER_RETRACTED_POS);
+        Debug.log(indexer.getPosition());
     }
 
 
@@ -59,19 +62,43 @@ public class Shooter {
     }
 
 
-    public void shoot(){
-
-        leftFlywheel.setPower(1.0);
-        rightFlywheel.setPower(1.0); //calibrate this
-        indexer.setPosition(INDEXER_EXTENDED_POS);
+    public void shoot(int rings){
         try {
-            Thread.sleep(200); // calibrate this
+            flywheel.setPower(0.97);//calibrate this
+            Thread.sleep(1500);
+            for(int i = 0; i < rings; i++) { //make this parametric?
+                indexer.setPosition(INDEXER_EXTENDED_POS);
+                Thread.sleep(250);
+                indexer.setPosition(INDEXER_RETRACTED_POS);
+                Thread.sleep(250);
+            }
+            flywheel.setPower(0);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        leftFlywheel.setPower(0);
-        rightFlywheel.setPower(0);
-        indexer.setPosition(INDEXER_RETRACTED_POS);
+    }
+
+
+
+    /**
+     * uses time and power on the indexer
+     */
+    public void ghettoShoot(){
+        flywheel.setPower(0.97);
+        try {
+            Thread.currentThread().sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        indexer.setPosition(0.6);
+        try {
+            Thread.currentThread().sleep(5020);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        indexer.setPosition(0.5);
+        flywheel.setPower(0);
+
     }
 
     /*
